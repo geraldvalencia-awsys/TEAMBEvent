@@ -1,0 +1,329 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Word Scramble Team B</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F6F6; --surface:#FFFFFF; --fg:#14262B; --muted:#58707A;
+  --accent:#2D6A8E; --accent-ink:#FFFFFF; --tile:#E3EEEE; --line:#D3E0E1;
+  --good:#1E7F4F; --good-bg:#E1F3E8; --bad:#B3402F; --prize:#F2B632; --prize-ink:#3A2A00;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1A1E; --surface:#16272D; --fg:#E7F1F2; --muted:#93AEB5;
+  --accent:#7DB8DD; --accent-ink:#0E1A1E; --tile:#20363D; --line:#2A434B;
+  --good:#6FD39A; --good-bg:#17382A; --bad:#F08A78; --prize:#F4C35A; --prize-ink:#2B1F00; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1A1E; --surface:#16272D; --fg:#E7F1F2; --muted:#93AEB5;
+  --accent:#7DB8DD; --accent-ink:#0E1A1E; --tile:#20363D; --line:#2A434B;
+  --good:#6FD39A; --good-bg:#17382A; --bad:#F08A78; --prize:#F4C35A; --prize-ink:#2B1F00; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:32rem;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:clamp(1.8rem,6vw,2.4rem);font-weight:800}
+h2{font-size:1.4rem;font-weight:800}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.btn{font:700 1.05rem var(--body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:16px 18px;min-height:56px;width:100%;cursor:pointer;touch-action:manipulation}
+.btn-outline{font:700 1.05rem var(--body);background:transparent;color:var(--fg);border:2px solid var(--line);border-radius:12px;padding:14px 18px;min-height:56px;width:100%;cursor:pointer;touch-action:manipulation}
+.btn:focus-visible,.btn-outline:focus-visible,.field:focus-visible,.check:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:default}
+.rules{display:flex;gap:8px;flex-wrap:wrap}
+.rules span{background:var(--tile);border-radius:999px;padding:7px 13px;font-weight:600;font-size:.9rem}
+.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.timer{font-family:var(--display);font-weight:800;font-size:2.6rem;font-variant-numeric:tabular-nums;line-height:1}
+.timer.low{color:var(--bad)}
+.bar{height:8px;border-radius:999px;background:var(--tile);overflow:hidden}
+.bar>i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;transition:transform .25s linear}
+.word{display:flex;flex-direction:column;gap:12px}
+.tiles{display:flex;gap:6px;flex-wrap:wrap}
+.tiles b{font-family:var(--display);font-weight:800;font-size:1.4rem;width:2.2rem;height:2.6rem;display:grid;place-items:center;background:var(--tile);border-radius:8px;flex-shrink:0}
+.row{display:flex;gap:8px}
+.field{flex:1;min-width:0;font:600 1.1rem var(--body);text-transform:uppercase;letter-spacing:.08em;padding:13px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--fg);-webkit-appearance:none;appearance:none}
+.field.wrong{border-color:var(--bad);animation:shake .3s}
+.check{font:700 1rem var(--body);background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:0 18px;min-height:50px;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+.hint{min-height:1.2em;font-size:.88rem;font-weight:600;color:var(--bad)}
+.word.done{background:var(--good-bg);border-color:var(--good)}
+.word.done .tiles b{background:var(--good);color:var(--surface)}
+.ok{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--good)}
+.summary{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.summary li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-weight:600}
+.summary li:last-child{border:0}
+.big{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1}
+
+/* Prize / gift */
+.prize-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:14px 16px;font:700 1rem var(--body);background:var(--prize);color:var(--prize-ink);border:0;border-radius:12px;cursor:pointer;touch-action:manipulation}
+.prize-btn:focus-visible,.gift:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.prizecard{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.gift{display:grid;place-items:center;width:168px;height:168px;border-radius:50%;border:0;background:var(--prize);color:var(--prize-ink);cursor:pointer;touch-action:manipulation}
+.reveal{font-size:clamp(1.8rem,6vw,2.6rem)}
+
+/* Time-up overlay choices */
+.timeup-actions{display:flex;flex-direction:column;gap:12px}
+
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion: reduce){.field.wrong{animation:none}.bar>i{transition:none}}
+@media (max-width:400px){
+  .tiles b{font-size:1.2rem;width:2rem;height:2.4rem}
+  h1{font-size:1.8rem}
+  .timer{font-size:2.2rem}
+}
+</style>
+<main id="app" aria-live="polite"></main>
+<script>
+(function(){
+  var TEAM = "Team B";
+  var SECONDS = 60;
+  var SETS = [[{"s":"LEHTO","a":"HOTEL"},{"s":"ISRMUTO","a":"TOURISM"},{"s":"VCESIRE","a":"SERVICE"}],[{"s":"PLNKRTE","a":null},{"s":"VXOMTAR","a":null},{"s":"GZBLUNE","a":null}],[{"s":"SCSUCES","a":"SUCCESS"},{"s":"HTWROG","a":"GROWTH"},{"s":"RAECER","a":"CAREER"}]];
+  var app = document.getElementById("app");
+  var results = [];
+  var timerId = null;
+  var quitted = false;
+  var SK = "wsb_state";
+
+  function saveState(s){try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
+  function loadState(){try{var v=localStorage.getItem(SK);return v?JSON.parse(v):null;}catch(e){return null;}}
+  function clearState(){try{localStorage.removeItem(SK);}catch(e){}}
+
+  function el(tag,cls,text){var n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
+  function clear(){if(timerId){clearInterval(timerId);timerId=null;}app.textContent="";window.scrollTo(0,0);}
+
+  function giftIcon(size){
+    var ns="http://www.w3.org/2000/svg";
+    var s=document.createElementNS(ns,"svg");
+    s.setAttribute("viewBox","0 0 24 24");s.setAttribute("width",size);s.setAttribute("height",size);s.setAttribute("aria-hidden","true");
+    s.innerHTML='<rect x="3" y="8" width="18" height="4" rx="1" fill="currentColor"/><rect x="4.5" y="12" width="15" height="8" rx="1" fill="currentColor"/><rect x="11" y="8" width="2" height="12" fill="var(--prize)"/><circle cx="9.2" cy="6.2" r="2.1" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14.8" cy="6.2" r="2.1" fill="none" stroke="currentColor" stroke-width="1.6"/>';
+    return s;
+  }
+  function quitBtn(){
+    var b=el("button","prize-btn");b.type="button";
+    b.appendChild(giftIcon(22));
+    b.appendChild(el("span",null,"Give up and claim your prize"));
+    b.onclick=function(){quit();};
+    return b;
+  }
+  function quit(){
+    quitted=true;
+    saveState({screen:"quit"});
+    clear();
+    app.appendChild(el("div","eyebrow",TEAM));
+    app.appendChild(el("h1",null,"Your prize is ready"));
+    var c=el("div","card prizecard");
+    c.appendChild(el("p","muted","You stopped here. Tap the gift to open your prize."));
+    var g=el("button","gift");g.type="button";g.setAttribute("aria-label","Open your prize");
+    g.appendChild(giftIcon(96));
+    g.onclick=function(){
+      saveState({screen:"quitterreveal"});
+      clear();
+      app.appendChild(el("div","eyebrow",TEAM));
+      app.appendChild(el("h1","reveal","Sorry, quitters never win."));
+      app.appendChild(el("p","muted","Put your phone down and wait for your speaker."));
+    };
+    c.appendChild(g);
+    app.appendChild(c);
+  }
+
+  function welcome(){
+    clearState();
+    clear();
+    app.appendChild(el("div","eyebrow","Seminar ice breaker"));
+    app.appendChild(el("h1",null,TEAM));
+    var c=el("div","card");
+    c.appendChild(el("h2",null,"Word Scramble"));
+    c.appendChild(el("p","muted","Unscramble the three hotel and tourism words in each round. Work together as a team and type your answers."));
+    var r=el("div","rules");
+    ["3 rounds","3 words each","1 minute per round"].forEach(function(t){r.appendChild(el("span",null,t));});
+    c.appendChild(r);
+    app.appendChild(c);
+    var b=el("button","btn","Start Round 1");
+    b.onclick=function(){ready(0);};
+    app.appendChild(b);
+    app.appendChild(el("p","muted","Wait for your speaker to say \u201Cgo\u201D before you tap start."));
+  }
+
+  function ready(i){
+    saveState({screen:"ready",round:i,results:results});
+    clear();
+    app.appendChild(el("div","eyebrow",TEAM));
+    app.appendChild(el("h1",null,"Round "+(i+1)+" of "+SETS.length));
+    var c=el("div","card");
+    c.appendChild(el("p",null,"You have "+SECONDS+" seconds to unscramble 3 words. The timer begins when you tap the button."));
+    app.appendChild(c);
+    var b=el("button","btn","Start Round "+(i+1));
+    b.onclick=function(){play(i);};
+    app.appendChild(b);
+  }
+
+  function play(i){
+    clear();
+    var words=SETS[i];
+    var solved=words.map(function(){return false;});
+    var deadline=Date.now()+SECONDS*1000;
+    var finished=false;
+
+    var top=el("div","topbar");
+    var left=el("div");
+    left.appendChild(el("div","eyebrow",TEAM+" \u00B7 Round "+(i+1)));
+    var count=el("div","muted","0 of 3 solved");
+    left.appendChild(count);
+    var timer=el("div","timer",String(SECONDS));
+    top.appendChild(left);top.appendChild(timer);
+    app.appendChild(top);
+    var bar=el("div","bar");var fill=document.createElement("i");bar.appendChild(fill);app.appendChild(bar);
+
+    words.forEach(function(w,k){
+      var card=el("form","card word");
+      card.setAttribute("autocomplete","off");
+      var tiles=el("div","tiles");
+      tiles.setAttribute("aria-label","Scrambled letters: "+w.s.split("").join(" "));
+      w.s.split("").forEach(function(ch){tiles.appendChild(el("b",null,ch));});
+      card.appendChild(tiles);
+      var row=el("div","row");
+      var input=el("input","field");
+      input.type="text";input.id="word"+k;input.name="word"+k;
+      input.setAttribute("autocapitalize","characters");input.setAttribute("autocomplete","off");
+      input.setAttribute("autocorrect","off");input.setAttribute("spellcheck","false");
+      input.setAttribute("aria-label","Your answer for word "+(k+1));
+      input.maxLength=20;
+      var chk=el("button","check","Check");chk.type="submit";
+      row.appendChild(input);row.appendChild(chk);
+      card.appendChild(row);
+      var hint=el("div","hint");card.appendChild(hint);
+      card.addEventListener("submit",function(e){
+        e.preventDefault();
+        if(finished)return;
+        var v=input.value.trim().toUpperCase();
+        if(!v)return;
+        if(w.a&&v===w.a){
+          solved[k]=true;
+          card.classList.add("done");
+          card.textContent="";
+          var t2=el("div","tiles");w.a.split("").forEach(function(ch){t2.appendChild(el("b",null,ch));});
+          card.appendChild(t2);
+          card.appendChild(el("div","ok","\u2713 Correct"));
+          update();
+          if(solved.every(Boolean))finish(false);
+        } else {
+          input.classList.remove("wrong");void input.offsetWidth;input.classList.add("wrong");
+          hint.textContent="Not quite. Keep trying.";
+          input.select();
+        }
+      });
+      app.appendChild(card);
+    });
+    if(i===1)app.appendChild(quitBtn());
+
+    function update(){
+      var n=solved.filter(Boolean).length;
+      count.textContent=n+" of 3 solved";
+    }
+    function tick(){
+      var left=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+      timer.textContent=String(left);
+      timer.className="timer"+(left<=10?" low":"");
+      fill.style.transform="scaleX("+Math.max(0,(deadline-Date.now())/(SECONDS*1000))+")";
+      if(left<=0)finish(true);
+    }
+    function finish(timeUp){
+      if(finished)return;
+      finished=true;
+      if(timerId){clearInterval(timerId);timerId=null;}
+      var n=solved.filter(Boolean).length;
+      results[i]=n;
+      if(timeUp){
+        setTimeout(function(){if(!quitted)timeUpScreen(i,n);},0);
+      } else {
+        setTimeout(function(){if(!quitted)roundEnd(i,n,false);},900);
+      }
+    }
+    tick();timerId=setInterval(tick,250);
+    var first=document.getElementById("word0");if(first)first.focus();
+  }
+
+  function timeUpScreen(i,n){
+    saveState({screen:"timeup",round:i,results:results});
+    clear();
+    var last=i===SETS.length-1;
+    app.appendChild(el("div","eyebrow",TEAM+" \u00B7 Round "+(i+1)));
+    app.appendChild(el("h1",null,"Time\u2019s up!"));
+    var c=el("div","card");
+    c.appendChild(el("div","big",n+" / 3"));
+    c.appendChild(el("p","muted","words solved this round"));
+    app.appendChild(c);
+    if(i===1){
+      var actions=el("div","timeup-actions");
+      var giveUp=el("button","prize-btn");giveUp.type="button";
+      giveUp.appendChild(giftIcon(22));
+      giveUp.appendChild(el("span",null,"Give up and claim your prize"));
+      giveUp.onclick=function(){quit();};
+      actions.appendChild(giveUp);
+      var cont=el("button","btn",last?"See final results":"Continue to next round");
+      cont.onclick=function(){last?done():ready(i+1);};
+      actions.appendChild(cont);
+      app.appendChild(actions);
+    } else {
+      var cont=el("button","btn",last?"See final results":"Continue to next round");
+      cont.onclick=function(){last?done():ready(i+1);};
+      app.appendChild(cont);
+    }
+  }
+
+  function roundEnd(i,n,timeUp){
+    saveState({screen:"roundend",round:i,results:results});
+    clear();
+    app.appendChild(el("div","eyebrow",TEAM+" \u00B7 Round "+(i+1)));
+    app.appendChild(el("h1",null,n===3?"All solved!":"Round over"));
+    var c=el("div","card");
+    c.appendChild(el("div","big",n+" / 3"));
+    c.appendChild(el("p","muted","words solved this round"));
+    app.appendChild(c);
+    var last=i===SETS.length-1;
+    var b=el("button","btn",last?"Finish":"Next round");
+    b.onclick=function(){last?done():ready(i+1);};
+    app.appendChild(b);
+  }
+
+  function done(){
+    saveState({screen:"done",results:results});
+    clear();
+    app.appendChild(el("div","eyebrow",TEAM));
+    app.appendChild(el("h1",null,"You\u2019re done!"));
+    var c=el("div","card");
+    var ul=el("ul","summary");
+    results.forEach(function(n,i){
+      var li=el("li");li.appendChild(el("span",null,"Round "+(i+1)));li.appendChild(el("span",null,n+" of 3"));ul.appendChild(li);
+    });
+    c.appendChild(ul);
+    app.appendChild(c);
+    app.appendChild(el("p",null,"Put your phone down and get ready to share what you noticed with the group."));
+  }
+
+  // Restore state on load
+  (function restore(){
+    var st=loadState();
+    if(!st){welcome();return;}
+    results=st.results||[];
+    var i=st.round||0;
+    var n=results[i]||0;
+    if(st.screen==="quit"){quitted=true;quit();return;}
+    if(st.screen==="quitterreveal"){
+      quitted=true;
+      app.appendChild(el("div","eyebrow",TEAM));
+      app.appendChild(el("h1","reveal","Sorry, quitters never win."));
+      app.appendChild(el("p","muted","Put your phone down and wait for your speaker."));
+      return;
+    }
+    if(st.screen==="ready"){ready(i);return;}
+    if(st.screen==="timeup"){timeUpScreen(i,n);return;}
+    if(st.screen==="roundend"){roundEnd(i,n,false);return;}
+    if(st.screen==="done"){done();return;}
+    welcome();
+  })();
+})();
+</script>
+</body></html>
