@@ -86,9 +86,9 @@ h2{font-size:1.4rem;font-weight:800}
   var quitted = false;
   var SK = "wsb_state";
 
-  function saveState(s){try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
-  function loadState(){try{var v=localStorage.getItem(SK);return v?JSON.parse(v):null;}catch(e){return null;}}
-  function clearState(){try{localStorage.removeItem(SK);}catch(e){}}
+  function saveState(s){try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}try{sessionStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
+  function loadState(){try{var v=localStorage.getItem(SK)||sessionStorage.getItem(SK);return v?JSON.parse(v):null;}catch(e){return null;}}
+  function clearState(){try{localStorage.removeItem(SK);}catch(e){}try{sessionStorage.removeItem(SK);}catch(e){}}
 
   function el(tag,cls,text){var n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
   function clear(){if(timerId){clearInterval(timerId);timerId=null;}app.textContent="";window.scrollTo(0,0);}
@@ -159,11 +159,11 @@ h2{font-size:1.4rem;font-weight:800}
     app.appendChild(b);
   }
 
-  function play(i){
+  function play(i,savedDeadline){
     clear();
     var words=SETS[i];
     var solved=words.map(function(){return false;});
-    var deadline=Date.now()+SECONDS*1000;
+    var deadline=savedDeadline||Date.now()+SECONDS*1000;saveState({screen:"play",round:i,results:results,deadline:deadline});
     var finished=false;
 
     var top=el("div","topbar");
@@ -318,7 +318,7 @@ h2{font-size:1.4rem;font-weight:800}
       app.appendChild(el("p","muted","Put your phone down and wait for your speaker."));
       return;
     }
-    if(st.screen==="ready"){ready(i);return;}
+    if(st.screen==="ready"){ready(i);return;}if(st.screen==="play"){play(i,st.deadline);return;}
     if(st.screen==="timeup"){timeUpScreen(i,n);return;}
     if(st.screen==="roundend"){roundEnd(i,n,false);return;}
     if(st.screen==="done"){done();return;}
